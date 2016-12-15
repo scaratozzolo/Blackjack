@@ -22,13 +22,15 @@ public class Blackjack {
 	static Cards cards = new Cards();
 	
 	static boolean keepPlaying = true; //used for while loop to keep playing
+	static boolean playing = true; //used for do while loop for each time a card is added to user's hand
 	
 	public static void main(String[] args) {
 		
-		String input;	//used for inputs
 		boolean cont = false; //used for do while loop to ask if the user wants to keep playing
 		final double startingCash;
 		double currentCash;
+		double bets = 0;
+		int total;
 		
 		currentDeckFace = new ArrayList<String>();
 		currentDeckValue = new ArrayList<Integer>();
@@ -51,16 +53,30 @@ public class Blackjack {
 			initializeCards();	//clears old deck to create a new one
 			dealStartCards();	//deals 2 cards to the user and the dealer
 			
-			System.out.println(userFace);
-			System.out.println(userValue);
-			System.out.println(dealerFace);
-			System.out.println(dealerValue);
+			System.out.println("How much money would you like to bet? Enter the amount:");
+			double bet = keyboard.nextDouble();
+			keyboard.nextLine();		//TODO check user's money
+			currentCash -= bet;
+			bets += bet;
+			
+			do {
+				total = userTotal();
+				System.out.println("Your cards are " + userFace + " which totals " + total + ".");
+				
+				System.out.println("Do you want to Stand or Hit? Enter 1 for stand or 2 for Hit:");
+				int input = keyboard.nextInt();
+				keyboard.nextLine();
+				
+				standHit(input);
+				
+				
+			}while (playing);
 			
 			//loop used to ask the user if they want to keep playing.
 			do {
 				System.out.println();
 				System.out.println("Would you like to continue? Yes/No");
-				input = keyboard.nextLine();
+				String input = keyboard.nextLine();
 			
 				String verified = verify(input);
 			
@@ -111,6 +127,7 @@ public class Blackjack {
     	
     }
 	
+	//deals four starting cards, two to user and two to dealer
 	public static void dealStartCards() {
 		
 		int value;
@@ -119,8 +136,8 @@ public class Blackjack {
 		cards.setCards(currentDeckFace.size());
 		int user1 = cards.getPick();
 		if (currentDeckValue.get(user1) == 0) {
-			System.out.println("You have an ace! Would you like to use it as a 1 or an 11? Enter 1 or 11:");
-			int input = keyboard.nextInt();
+			System.out.println("You have an ace! Would you like to use it as a 1 or an 11? Enter 1 or 11:"); 
+			int input = keyboard.nextInt();	//todo check if 1 or 11
 			keyboard.nextLine();
 			userFace.add(currentDeckFace.get(user1));
 			userValue.add(input);
@@ -160,7 +177,7 @@ public class Blackjack {
 		int user2 = cards.getPick();
 		if (currentDeckValue.get(user2) == 0) {
 			System.out.println("You have an ace! Would you like to use it as a 1 or an 11? Enter 1 or 11:");
-			int input = keyboard.nextInt();
+			int input = keyboard.nextInt(); //todo check if 1 or 11
 			keyboard.nextLine();
 			userFace.add(currentDeckFace.get(user2));
 			userValue.add(input);
@@ -213,5 +230,69 @@ public class Blackjack {
 		}
 	}
 	
+	public static int userTotal() {
+		int total = 0;
+		for (int i = 0; i < userValue.size(); i++) {
+			total = total + userValue.get(i);
+		}
+		
+		return total;
+	}
 	
+	public static void dealUserCard() {
+		cards.setCards(currentDeckFace.size());
+		int user1 = cards.getPick();
+		if (currentDeckValue.get(user1) == 0) {
+			System.out.println("You have an ace! Would you like to use it as a 1 or an 11? Enter 1 or 11:");
+			int input = keyboard.nextInt(); //todo check if 1 or 11
+			keyboard.nextLine();
+			userFace.add(currentDeckFace.get(user1));
+			userValue.add(input);
+			currentDeckFace.remove(user1);
+			currentDeckValue.remove(user1);
+		} else {
+			userFace.add(currentDeckFace.get(user1));
+			userValue.add(currentDeckValue.get(user1));
+			currentDeckFace.remove(user1);
+			currentDeckValue.remove(user1);
+		}
+	}
+	
+	public static void dealDealerCard() {
+		int value;
+		cards.setCards(currentDeckFace.size());
+		int dealer1 = cards.getPick();
+		if (currentDeckValue.get(dealer1) == 0) {
+			int number = random.nextInt(2)+1;
+			if (number == 1) {
+				value = 1;
+			} else {
+				value = 11;
+			}
+			dealerFace.add(currentDeckFace.get(dealer1));
+			dealerValue.add(value);
+			currentDeckFace.remove(dealer1);
+			currentDeckValue.remove(dealer1);
+		} else {
+			dealerFace.add(currentDeckFace.get(dealer1));
+			dealerValue.add(currentDeckValue.get(dealer1));
+			currentDeckFace.remove(dealer1);
+			currentDeckValue.remove(dealer1);
+		}
+	}
+	
+	public static void standHit(int value) {
+		if (value == 1) {
+			playing  = false;
+		} else {
+			dealUserCard();
+		}
+	}
 }
+
+/* TODO
+ * check players bet to their money
+ * check if user entered 1 or 11 on ace
+ * check who won
+ * 
+ */
