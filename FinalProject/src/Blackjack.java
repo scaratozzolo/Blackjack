@@ -60,6 +60,7 @@ public class Blackjack {
 			bets += bet;
 			
 			do {
+				
 				total = userTotal();
 				System.out.println("Your cards are " + userFace + " which totals " + total + ".");
 				
@@ -68,8 +69,7 @@ public class Blackjack {
 				keyboard.nextLine();
 				
 				standHit(input);
-				
-				
+	
 			}while (playing);
 			
 			//loop used to ask the user if they want to keep playing.
@@ -256,6 +256,9 @@ public class Blackjack {
 			currentDeckFace.remove(user1);
 			currentDeckValue.remove(user1);
 		}
+		
+		charlie();
+		
 	}
 	
 	public static void dealDealerCard() {
@@ -286,6 +289,13 @@ public class Blackjack {
 			playing  = false;
 		} else {
 			dealUserCard();
+		}
+	}
+	
+	public static void charlie() {
+		if (userFace.size() == 5 && userTotal() < 21) {
+			playing = false;
+			System.out.println("Five Card Charlie! Your cards were " + userFace + " and totaled " + userTotal() + ".");
 		}
 	}
 }
