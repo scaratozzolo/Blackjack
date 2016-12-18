@@ -79,8 +79,9 @@ public class Blackjack {
 				userCards();
 				System.out.println();
 				dealerShowing();
-				standHit();		//TODO check blackjack before standhit
 				blackjackBust();
+					
+				
 				
 	
 			}while (playing);
@@ -110,7 +111,7 @@ public class Blackjack {
 			}while (cont);
 		}
 		
-		
+		System.out.println("Thank you for playing!");
 		
 	}
 	
@@ -130,8 +131,9 @@ public class Blackjack {
     	char letter = lower.charAt(0);
     	int lowerLength = lower.length();
     	
-    	if (currentCash <= 0) {
-			System.out.println("I'm sorry, you have no more money to continue playing.");
+    	//ends the game if the user has no more money but tries to continue
+    	if (currentCash <= 0 && !(lower.equals("no") || (letter == 'n' && lowerLength == 1))) {
+			System.out.println("I'm sorry, you have no more money to continue.");
 			keepPlaying = false;
 			return "no";
 		} else if (lower.equals("yes") || (letter == 'y' && lowerLength == 1)) {
@@ -268,7 +270,7 @@ public class Blackjack {
 	
 	}
 	
-	public static void initializeCards() {
+	public static void initializeCards() { //clears all arrays and creates new ones, essentially creating a new deck of cards
 		currentDeckFace.clear();
 		currentDeckValue.clear();
 		userFace.clear();
@@ -285,7 +287,7 @@ public class Blackjack {
 		}
 	}
 	
-	public static int userTotal() {
+	public static int userTotal() { //totals the value of the user's cards
 		int total = 0;
 		for (int i = 0; i < userValue.size(); i++) {
 			total = total + userValue.get(i);
@@ -294,7 +296,7 @@ public class Blackjack {
 		return total;
 	}
 	
-	public static int dealerTotal() {
+	public static int dealerTotal() { //totals the value of the dealer's cards
 		int total = 0;
 		for (int i = 0; i < dealerValue.size(); i++) {
 			total = total + dealerValue.get(i);
@@ -303,7 +305,7 @@ public class Blackjack {
 		return total;
 	}
 	
-	public static int dealerShowingTotal() {
+	public static int dealerShowingTotal() { //totals the the dealer's up cards
 		int showing = 0;
 		for (int i = 1; i < dealerValue.size(); i++) {
 			showing = showing + dealerValue.get(i);
@@ -312,7 +314,7 @@ public class Blackjack {
 		return showing;
 	}
 	
-	public static void dealUserCard() {
+	public static void dealUserCard() { //deals a card to the user
 		
 		int total = userTotal();
 		boolean aceTest = true;
@@ -355,51 +357,60 @@ public class Blackjack {
 		
 	}
 	
-	public static void dealDealerCard() {
+	public static void dealDealerCard() { //deals a card to the dealer
+		int dealerTotal = dealerTotal();
 		int value;
+		
+		if (dealerTotal < 17) {
 		cards.setCards(currentDeckFace.size());
 		int dealer1 = cards.getPick();
 		if (currentDeckValue.get(dealer1) == 0) {
-			int number = random.nextInt(2)+1;
+				int number = random.nextInt(2)+1;
 			if (number == 1) {
-				value = 1;
+					value = 1;
 			} else {
 				value = 11;
 			}
-			dealerFace.add(currentDeckFace.get(dealer1));
-			dealerValue.add(value);
-			currentDeckFace.remove(dealer1);
-			currentDeckValue.remove(dealer1);
-		} else {
-			dealerFace.add(currentDeckFace.get(dealer1));
-			dealerValue.add(currentDeckValue.get(dealer1));
-			currentDeckFace.remove(dealer1);
-			currentDeckValue.remove(dealer1);
+				dealerFace.add(currentDeckFace.get(dealer1));
+				dealerValue.add(value);
+				currentDeckFace.remove(dealer1);
+				currentDeckValue.remove(dealer1);
+			} else {
+				dealerFace.add(currentDeckFace.get(dealer1));
+				dealerValue.add(currentDeckValue.get(dealer1));
+				currentDeckFace.remove(dealer1);
+				currentDeckValue.remove(dealer1);
+			}
 		}
 	}
 	
-	public static void standHit() {
-		System.out.println();
-		System.out.println("Do you want to Stand or Hit? Enter 1 for stand or 2 for Hit:");
-		int input = keyboard.nextInt();
-		keyboard.nextLine();
+	public static void standHit() { //asks the user if they want to stand or hit and then proceed accordingly
 		
-		if (input == 1) {
-			stand();
-		} else {
-			dealUserCard();
-			dealDealerCard();
+		if (playing = true) {
+			System.out.println();
+			System.out.println("Do you want to Stand or Hit? Enter 1 for stand or 2 for Hit:");
+			int input = keyboard.nextInt();
+			keyboard.nextLine();
+		
+			if (input == 1) {
+				stand();
+			} else if (input == 2){
+				dealUserCard();
+				dealDealerCard();
+			} else {
+				System.out.println("Broken");
+			}
 		}
 	}
 	
-	public static void charlie() {
+	public static void charlie() { //tests for five card charlie - if the user has five cards and doesn't bust
 		if (userFace.size() == 5 && userTotal() < 21) {
 			playing = false;
 			System.out.println("Five Card Charlie! Your cards were " + userFace + " and totaled " + userTotal() + ".");
 		}
 	}
 	
-	public static void userCards() {
+	public static void userCards() { //outputs the user's cards
 		int total = userTotal();
 		
 		System.out.println("Your cards are: ");
@@ -410,7 +421,7 @@ public class Blackjack {
 		System.out.println("That totals " + total + ".");
 	}
 	
-	public static void dealerShowing() {
+	public static void dealerShowing() { //outputs the dealer's up cards
 		int showing = dealerShowingTotal();
 		
 		System.out.println("The dealer has: ");
@@ -422,96 +433,374 @@ public class Blackjack {
 		System.out.println("The dealer has " + showing + " showing.");
 	}
 	
-	public static void stand() {
+	public static void stand() { //ends the round for the user
 		playing  = false;
 		dealDealerCard();
+		bust();
 	}
 	
-	public static void checkWinner(String result) {
+	public static void checkWinner(String result) { //checks the winner of the game depending on different situations and also outputs wins/losses
 		
 		int user = userTotal();
 		int dealer = dealerTotal();
 		
-		if (result == "null") {
+		if (result == "finished") {
 			if (user > dealer) {
 				double winnings = bet * 2;
 				currentCash += winnings;
 				totalWinnings += winnings;
+				System.out.println();
 				System.out.println("Your cards " + userFace + " which total " + user);
 				System.out.println("The dealer's cards " + dealerFace + " which total " + dealer);
-				System.out.println("YOU WON! Your winnings are " + winnings + " which brings your current cash to " + currentCash + ".");
+				System.out.println("YOU WON! Your winnings are $" + winnings + " which brings your current cash to $" + currentCash + ".");
 			} else if (user < dealer) {
-				double losses = bet * 2;
-				currentCash -= losses;
-				totalWinnings -= losses;
+				totalWinnings -= bet;
+				System.out.println();
 				System.out.println("Your cards " + userFace + " which total " + user);
 				System.out.println("The dealer's cards " + dealerFace + " which total " + dealer);
-				System.out.println("YOU LOSE! Your losses are " + losses + " which brings your current cash to " + currentCash + ".");
+				System.out.println("YOU LOSE! Your losses are $" + bet + " which brings your current cash to $" + currentCash + ".");
 			} else if (user == dealer) {
-				double losses = bet * 2;
-				currentCash -= losses;
-				totalWinnings -= losses;
+				totalWinnings -= bet;
+				System.out.println();
 				System.out.println("Your cards " + userFace + " which total " + user);
 				System.out.println("The dealer's cards " + dealerFace + " which total " + dealer);
-				System.out.println("IT'S A TIE, YOU LOSE! Your losses are " + losses + " which brings your current cash to " + currentCash + ".");
+				System.out.println("IT'S A TIE, YOU LOSE! Your losses are $" + bet + " which brings your current cash to $" + currentCash + ".");
 			}
 		} else if (result == "userBlackjack") {
-			double winnings = bet * 4;
+			double winnings = bet + (bet * 1.5);
 			currentCash += winnings;
 			totalWinnings += winnings;
+			System.out.println();
 			System.out.println("Your cards " + userFace + " which total " + user);
 			System.out.println("The dealer's cards " + dealerFace + " which total " + dealer);
-			System.out.println("YOU WON! Your winnings are " + winnings + " which brings your current cash to " + currentCash + ".");
+			System.out.println("YOU WON! Your winnings are $" + winnings + " which brings your current cash to $" + currentCash + ".");
 		} else if (result == "dealerBlackjack") {
-			double losses = bet * 4;
+			double losses = (bet * 1.5);
 			currentCash -= losses;
 			totalWinnings -= losses;
+			System.out.println();
 			System.out.println("Your cards " + userFace + " which total " + user);
 			System.out.println("The dealer's cards " + dealerFace + " which total " + dealer);
-			System.out.println("YOU LOSE! Your losses are " + losses + " which brings your current cash to " + currentCash + ".");
+			System.out.println("YOU LOSE! Your losses are $" + losses + " which brings your current cash to $" + currentCash + ".");
 		} else if (result == "userBusted") {
-			double losses = bet * 3;
-			currentCash -= losses;
-			totalWinnings -= losses;
+			totalWinnings -= bet;
+			System.out.println();
 			System.out.println("Your cards " + userFace + " which total " + user);
 			System.out.println("The dealer's cards " + dealerFace + " which total " + dealer);
-			System.out.println("YOU LOSE! Your losses are " + losses + " which brings your current cash to " + currentCash + ".");	
+			System.out.println("YOU LOSE! Your losses are $" + bet + " which brings your current cash to $" + currentCash + ".");	
 		} else if (result == "dealerBusted") {
-			double winnings = bet * 3;
+			double winnings = bet * 2;
 			currentCash += winnings;
 			totalWinnings += winnings;
+			System.out.println();
 			System.out.println("Your cards " + userFace + " which total " + user);
 			System.out.println("The dealer's cards " + dealerFace + " which total " + dealer);
-			System.out.println("YOU WON! Your winnings are " + winnings + " which brings your current cash to " + currentCash + ".");
+			System.out.println("YOU WON! Your winnings are $" + winnings + " which brings your current cash to $" + currentCash + ".");
 		} else {
 			System.out.println("Broken");
 		}
 	}
 	
-	public static void blackjackBust() {
+	public static void blackjackBust() { //checks if the user or dealer have blackjack or busted, if not the user can stand or hit
 		int userTotal = userTotal();
 		int dealerTotal = dealerTotal();
 		
 		if (userFace.size() == 2 && userTotal == 21) {
+			System.out.println();
 			System.out.println("BLACKJACK!");
+			playing = false;
 			checkWinner("userBlackjack");
 		} else if (dealerFace.size() == 2 && dealerTotal == 21){
+			System.out.println();
 			System.out.println("The dealer got Blackjack!");
+			playing = false;
 			checkWinner("dealerBlackjack");
 		} else if (userTotal > 21) {
-			System.out.println("You busted!");
+			System.out.println();
+			System.out.println("BUSTED!");
+			playing = false;
 			checkWinner("userBusted");
 		} else if (dealerTotal > 21) {
+			System.out.println();
 			System.out.println("The dealer busted!");
+			playing = false;
 			checkWinner("dealerBusted");
 		} else {
-			checkWinner("null");
+			standHit();	
 		}
 		
 	}
+	
+	public static void bust() { //checks if the dealer or user busted - if not, it ends the round
+		
+		int userTotal = userTotal();
+		int dealerTotal = dealerTotal();
+		
+		if (userTotal > 21) {
+			System.out.println();
+			System.out.println("BUSTED!");
+			playing = false;
+			checkWinner("userBusted");
+		} else if (dealerTotal > 21) {
+			System.out.println();
+			System.out.println("The dealer busted!");
+			playing = false;
+			checkWinner("dealerBusted");
+		} else {
+			playing = false;
+			checkWinner("finished");
+		}
+	}
 }
 
-/* TODO
- * check who won
- * 
+/*
+ Welcome to Blackjack!
+---------------------
+The aim of the game is to get your cards as close to or equal 21 without going over.
+If it's a tie between you and the dealer, the dealer wins.
+
+How much money do you have to play with? Enter the amount:
+500
+How much money would you like to bet? Enter the amount:
+20
+Your cards are: 
+8 of Hearts
+5 of Spades
+That totals 13.
+
+The dealer has: 
+Jack of Spades
+The dealer has 10 showing.
+
+Do you want to Stand or Hit? Enter 1 for stand or 2 for Hit:
+2
+Your cards are: 
+8 of Hearts
+5 of Spades
+7 of Hearts
+That totals 20.
+
+The dealer has: 
+Jack of Spades
+9 of Spades
+The dealer has 19 showing.
+
+Do you want to Stand or Hit? Enter 1 for stand or 2 for Hit:
+1
+
+Your cards [8 of Hearts, 5 of Spades, 7 of Hearts] which total 20
+The dealer's cards [2 of Hearts, Jack of Spades, 9 of Spades] which total 21
+YOU LOSE! Your losses are $20.0 which brings your current cash to $480.0.
+
+Would you like to continue? Yes/No
+yes
+How much money would you like to bet? Enter the amount:
+50
+Your cards are: 
+8 of Clubs
+3 of Hearts
+That totals 11.
+
+The dealer has: 
+10 of Clubs
+The dealer has 10 showing.
+
+Do you want to Stand or Hit? Enter 1 for stand or 2 for Hit:
+2
+Your cards are: 
+8 of Clubs
+3 of Hearts
+10 of Hearts
+That totals 21.
+
+The dealer has: 
+10 of Clubs
+Jack of Diamonds
+The dealer has 20 showing.
+
+The dealer busted!
+
+Your cards [8 of Clubs, 3 of Hearts, 10 of Hearts] which total 21
+The dealer's cards [5 of Hearts, 10 of Clubs, Jack of Diamonds] which total 25
+YOU WON! Your winnings are $100.0 which brings your current cash to $530.0.
+
+Would you like to continue? Yes/No
+yes
+How much money would you like to bet? Enter the amount:
+500
+Your cards are: 
+Jack of Spades
+7 of Spades
+That totals 17.
+
+The dealer has: 
+7 of Clubs
+The dealer has 7 showing.
+
+Do you want to Stand or Hit? Enter 1 for stand or 2 for Hit:
+1
+
+Your cards [Jack of Spades, 7 of Spades] which total 17
+The dealer's cards [10 of Clubs, 7 of Clubs] which total 17
+IT'S A TIE, YOU LOSE! Your losses are $500.0 which brings your current cash to $30.0.
+
+Would you like to continue? Yes/No
+yes
+How much money would you like to bet? Enter the amount:
+15
+Your cards are: 
+2 of Spades
+5 of Hearts
+That totals 7.
+
+The dealer has: 
+8 of Hearts
+The dealer has 8 showing.
+
+Do you want to Stand or Hit? Enter 1 for stand or 2 for Hit:
+2
+Your cards: [2 of Spades, 5 of Hearts] which totals 7.
+You have an ace! Would you like to use it as a 1 or an 11? Enter 1 or 11:
+11
+Your cards are: 
+2 of Spades
+5 of Hearts
+Ace of Clubs
+That totals 18.
+
+The dealer has: 
+8 of Hearts
+8 of Diamonds
+The dealer has 16 showing.
+
+The dealer busted!
+
+Your cards [2 of Spades, 5 of Hearts, Ace of Clubs] which total 18
+The dealer's cards [7 of Hearts, 8 of Hearts, 8 of Diamonds] which total 23
+YOU WON! Your winnings are $30.0 which brings your current cash to $45.0.
+
+Would you like to continue? Yes/No
+yes
+How much money would you like to bet? Enter the amount:
+30
+Your cards are: 
+6 of Hearts
+Queen of Hearts
+That totals 16.
+
+The dealer has: 
+5 of Spades
+The dealer has 5 showing.
+
+Do you want to Stand or Hit? Enter 1 for stand or 2 for Hit:
+1
+
+Your cards [6 of Hearts, Queen of Hearts] which total 16
+The dealer's cards [7 of Spades, 5 of Spades, 2 of Diamonds] which total 14
+YOU WON! Your winnings are $60.0 which brings your current cash to $75.0.
+
+Would you like to continue? Yes/No
+yes
+How much money would you like to bet? Enter the amount:
+25
+Your cards: [King of Hearts] which totals 0.
+You have an ace! Would you like to use it as a 1 or an 11? Enter 1 or 11:
+11
+Your cards are: 
+King of Hearts
+2 of Diamonds
+That totals 21.
+
+The dealer has: 
+5 of Spades
+The dealer has 5 showing.
+
+BLACKJACK!
+
+Your cards [King of Hearts, 2 of Diamonds] which total 21
+The dealer's cards [3 of Hearts, 5 of Spades] which total 8
+YOU WON! Your winnings are $62.5 which brings your current cash to $112.5.
+
+Would you like to continue? Yes/No
+yes
+How much money would you like to bet? Enter the amount:
+112.5
+Your cards: [] which totals 0.
+You have an ace! Would you like to use it as a 1 or an 11? Enter 1 or 11:
+11
+Your cards are: 
+Ace of Spades
+3 of Diamonds
+That totals 14.
+
+The dealer has: 
+6 of Spades
+The dealer has 6 showing.
+
+Do you want to Stand or Hit? Enter 1 for stand or 2 for Hit:
+2
+Your cards are: 
+Ace of Spades
+3 of Diamonds
+8 of Clubs
+That totals 22.
+
+The dealer has: 
+6 of Spades
+2 of Clubs
+The dealer has 8 showing.
+
+BUSTED!
+
+Your cards [Ace of Spades, 3 of Diamonds, 8 of Clubs] which total 22
+The dealer's cards [King of Hearts, 6 of Spades, 2 of Clubs] which total 18
+YOU LOSE! Your losses are $112.5 which brings your current cash to $0.0.
+
+Would you like to continue? Yes/No
+yes
+I'm sorry, you have no more money to continue.
+Thank you for playing!
+
+-------------------------------------------------------------------------------------------------------
+
+Welcome to Blackjack!
+---------------------
+The aim of the game is to get your cards as close to or equal 21 without going over.
+If it's a tie between you and the dealer, the dealer wins.
+
+How much money do you have to play with? Enter the amount:
+1
+How much money would you like to bet? Enter the amount:
+1
+Your cards are: 
+9 of Clubs
+Jack of Hearts
+That totals 19.
+
+The dealer has: 
+4 of Hearts
+The dealer has 4 showing.
+
+Do you want to Stand or Hit? Enter 1 for stand or 2 for Hit:
+2
+Your cards are: 
+9 of Clubs
+Jack of Hearts
+9 of Diamonds
+That totals 28.
+
+The dealer has: 
+4 of Hearts
+3 of Diamonds
+The dealer has 7 showing.
+
+BUSTED!
+
+Your cards [9 of Clubs, Jack of Hearts, 9 of Diamonds] which total 28
+The dealer's cards [6 of Spades, 4 of Hearts, 3 of Diamonds] which total 13
+YOU LOSE! Your losses are $1.0 which brings your current cash to $0.0.
+
+Would you like to continue? Yes/No
+no
+Thank you for playing!
  */
